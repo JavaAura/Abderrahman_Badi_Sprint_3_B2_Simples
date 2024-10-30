@@ -4,6 +4,7 @@
 /logs/
 src/main/webapp/node_modules/
 src/main/webapp/css/tailwind/output.css
+src/main/resources/application-prod.properties
 *.nar
 *.ear
 *.zip

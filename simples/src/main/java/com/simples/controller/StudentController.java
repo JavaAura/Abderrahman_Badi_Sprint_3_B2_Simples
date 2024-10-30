@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Student;
 import com.simples.service.StudentService;
 
@@ -77,7 +78,7 @@ public class StudentController {
     })
     @GetMapping("/{id}")
     public Student getStudent(
-            @Parameter(description = "ID of the student to be retrieved") @PathVariable("id") Long studentId) {
+            @Parameter(description = "ID of the student to be retrieved") @PathVariable("id") Long studentId) throws ResourceNotFoundException {
         return studentService.findStudentById(studentId);
     }
 
@@ -98,7 +99,7 @@ public class StudentController {
     @PutMapping("/{id}")
     public Student updateStudent(
             @Parameter(description = "Updated student data") @RequestBody Student student,
-            @Parameter(description = "ID of the student to be updated") @PathVariable("id") Long studentId) {
+            @Parameter(description = "ID of the student to be updated") @PathVariable("id") Long studentId) throws ResourceNotFoundException {
         return studentService.updateStudent(student, studentId);
     }
 
@@ -115,7 +116,7 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
-    public String deleteStudentById(@Parameter(description = "ID of the student to be deleted") @PathVariable("id") Long studentId) {
+    public String deleteStudentById(@Parameter(description = "ID of the student to be deleted") @PathVariable("id") Long studentId) throws ResourceNotFoundException {
         studentService.deleteStudentById(studentId);
         return "Deleted Successfully";
     }

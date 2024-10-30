@@ -1,26 +1,33 @@
 package com.simples.service;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.StringUtils;
 
+import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Trainer;
 import com.simples.repository.TrainerRepository;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Service interface for Trainer entity.
  * Defines methods for CRUD operations and additional business logic.
  */
+@Log4j2
 @Service
 public class TrainerService {
 
     @Autowired
     private TrainerRepository trainerRepository;
 
-    public Trainer findTrainerById(long id) {
-        return trainerRepository.findById(id).get();
+    public Trainer findTrainerById(long id) throws ResourceNotFoundException {
+        return trainerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Trainer not found with ID: " + id));
+
     }
 
     public Trainer addTrainer(Trainer trainer) {
@@ -28,32 +35,34 @@ public class TrainerService {
     }
 
     public List<Trainer> getTrainerList() {
-
         return (List<Trainer>) trainerRepository.findAll();
     }
 
-    public Trainer updateTrainer(Trainer trainer, Long trainerId) {
+    public Trainer updateTrainer(Trainer trainer, Long trainerId) throws ResourceNotFoundException {
 
-        Trainer trainerDB = trainerRepository.findById(trainerId).get();
+        Trainer trainerDB = findTrainerById(trainerId);
 
         // Updates fields if they are not null or empty.
-        if (Objects.nonNull(trainer.getFirstName()) && !"".equalsIgnoreCase(trainer.getFirstName())) {
+        if (StringUtils.isNotBlank(trainer.getFirstName())) {
             trainerDB.setFirstName(trainer.getFirstName());
         }
-        if (Objects.nonNull(trainer.getLastName()) && !"".equalsIgnoreCase(trainer.getLastName())) {
+        if (StringUtils.isNotBlank(trainer.getLastName())) {
             trainerDB.setLastName(trainer.getLastName());
         }
-        if (Objects.nonNull(trainer.getEmail()) && !"".equalsIgnoreCase(trainer.getEmail())) {
+        if (StringUtils.isNotBlank(trainer.getEmail())) {
             trainerDB.setEmail(trainer.getEmail());
         }
-        if (Objects.nonNull(trainer.getSpeciality()) && !"".equalsIgnoreCase(trainer.getSpeciality())) {
+        if (StringUtils.isNotBlank(trainer.getSpeciality())) {
             trainerDB.setSpeciality(trainer.getSpeciality());
         }
 
         return trainerRepository.save(trainerDB);
     }
 
-    public void deleteTrainerById(Long trainerId) {
-        trainerRepository.deleteById(trainerId);
+    @Transactional
+    public void deleteTrainerById(Long trainerId) throws ResourceNotFoundException {
+        Trainer trainer = findTrainerById(trainerId);
+        trainerRepository.delete(trainer);
+        log.info("Deleted trainer with ID: {}", trainerId);
     }
 }

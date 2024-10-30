@@ -3,9 +3,11 @@ package com.simples.service;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Student;
 import com.simples.repository.StudentRepository;
 
@@ -19,8 +21,9 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
-    public Student findStudentById(long id) {
-        return studentRepository.findById(id).get();
+    public Student findStudentById(long id) throws ResourceNotFoundException {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
     }
 
     public Student addStudent(Student student) {
@@ -32,21 +35,21 @@ public class StudentService {
         return (List<Student>) studentRepository.findAll();
     }
 
-    public Student updateStudent(Student student, Long studentId) {
+    public Student updateStudent(Student student, Long studentId) throws ResourceNotFoundException {
 
-        Student studentDB = studentRepository.findById(studentId).get();
+        Student studentDB = findStudentById(studentId);
 
         // Updates fields if they are not null or empty.
-        if (Objects.nonNull(student.getFirstName()) && !"".equalsIgnoreCase(student.getFirstName())) {
+        if (StringUtils.isNotBlank(student.getFirstName())) {
             studentDB.setFirstName(student.getFirstName());
         }
-        if (Objects.nonNull(student.getLastName()) && !"".equalsIgnoreCase(student.getLastName())) {
+        if (StringUtils.isNotBlank(student.getLastName())) {
             studentDB.setLastName(student.getLastName());
         }
-        if (Objects.nonNull(student.getEmail())  && !"".equalsIgnoreCase(student.getEmail())) {
+        if (StringUtils.isNotBlank(student.getEmail())) {
             studentDB.setEmail(student.getEmail());
         }
-        if (Objects.nonNull(student.getGrade())  && !"".equalsIgnoreCase(student.getGrade())) {
+        if (StringUtils.isNotBlank(student.getGrade())) {
             studentDB.setGrade(student.getGrade());
         }
         if (Objects.nonNull(student.getClassroom())) {
@@ -55,7 +58,8 @@ public class StudentService {
         return studentRepository.save(studentDB);
     }
 
-    public void deleteStudentById(Long studentId) {
-        studentRepository.deleteById(studentId);
+    public void deleteStudentById(Long studentId) throws ResourceNotFoundException {
+        Student student = findStudentById(studentId);
+        studentRepository.delete(student);
     }
 }

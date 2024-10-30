@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Program;
 import com.simples.service.ProgramService;
 
@@ -77,7 +78,7 @@ public class ProgramController {
     })
     @GetMapping("/{id}")
     public Program getProgram(
-            @Parameter(description = "ID of the program to be retrieved") @PathVariable("id") Long programId) {
+            @Parameter(description = "ID of the program to be retrieved") @PathVariable("id") Long programId) throws ResourceNotFoundException {
         return programService.findProgramById(programId);
     }
 
@@ -98,7 +99,7 @@ public class ProgramController {
     @PutMapping("/{id}")
     public Program updateProgram(
             @Parameter(description = "Updated program data") @RequestBody Program program,
-            @Parameter(description = "ID of the program to be updated") @PathVariable("id") Long programId) {
+            @Parameter(description = "ID of the program to be updated") @PathVariable("id") Long programId) throws ResourceNotFoundException {
         return programService.updateProgram(program, programId);
     }
 
@@ -115,7 +116,7 @@ public class ProgramController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
-    public String deleteProgramById(@Parameter(description = "ID of the program to be deleted") @PathVariable("id") Long programId) {
+    public String deleteProgramById(@Parameter(description = "ID of the program to be deleted") @PathVariable("id") Long programId) throws ResourceNotFoundException {
         programService.deleteProgramById(programId);
         return "Deleted Successfully";
     }

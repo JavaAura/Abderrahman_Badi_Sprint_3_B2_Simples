@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Trainer;
 import com.simples.service.TrainerService;
 
@@ -77,7 +78,7 @@ public class TrainerController {
     })
     @GetMapping("/{id}")
     public Trainer getTrainer(
-            @Parameter(description = "ID of the trainer to be retrieved") @PathVariable("id") Long trainerId) {
+            @Parameter(description = "ID of the trainer to be retrieved") @PathVariable("id") Long trainerId) throws ResourceNotFoundException {
         return trainerService.findTrainerById(trainerId);
     }
 
@@ -98,7 +99,7 @@ public class TrainerController {
     @PutMapping("/{id}")
     public Trainer updateTrainer(
             @Parameter(description = "Updated trainer data") @RequestBody Trainer trainer,
-            @Parameter(description = "ID of the trainer to be updated") @PathVariable("id") Long trainerId) {
+            @Parameter(description = "ID of the trainer to be updated") @PathVariable("id") Long trainerId) throws ResourceNotFoundException{
         return trainerService.updateTrainer(trainer, trainerId);
     }
 
@@ -115,7 +116,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
-    public String deleteTrainerById(@Parameter(description = "ID of the trainer to be deleted") @PathVariable("id") Long trainerId) {
+    public String deleteTrainerById(@Parameter(description = "ID of the trainer to be deleted") @PathVariable("id") Long trainerId) throws ResourceNotFoundException {
         trainerService.deleteTrainerById(trainerId);
         return "Deleted Successfully";
     }

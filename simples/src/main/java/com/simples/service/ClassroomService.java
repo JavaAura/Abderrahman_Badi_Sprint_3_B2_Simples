@@ -19,15 +19,15 @@ public class ClassroomService {
     @Autowired
     private ClassroomRepository classroomRepository;
 
-    public Classroom getClassroom(long id){
+    public Classroom findClassroomById(long id){
         return classroomRepository.findById(id).get();
     }
 
-    public Classroom saveClassroom(Classroom classroom) {
+    public Classroom addClassroom(Classroom classroom) {
         return classroomRepository.save(classroom);
     }
 
-    public List<Classroom> fetchClassroomList() {
+    public List<Classroom> getClassroomList() {
 
         return (List<Classroom>) classroomRepository.findAll();
     }

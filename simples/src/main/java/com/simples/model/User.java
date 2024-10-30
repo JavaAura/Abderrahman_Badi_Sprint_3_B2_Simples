@@ -11,9 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Represents a User entity in the application.
@@ -22,11 +20,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data // Generates getters, setters, toString, equals, and hashCode methods.
-@AllArgsConstructor // Generates a constructor with all arguments.
-@NoArgsConstructor
 public abstract class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "User first name shoudln't be empty")

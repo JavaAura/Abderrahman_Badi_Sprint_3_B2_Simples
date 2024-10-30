@@ -9,7 +9,6 @@ import com.simples.model.Program;
  * Repository interface for Program entity.
  * Provides CRUD operations and custom query methods through JpaRepository.
  */
-// @Repository
-// extends JpaRepository<Program, Long>
-public interface ProgramRepository {
+@Repository
+public interface ProgramRepository extends JpaRepository<Program, Long>{
 }

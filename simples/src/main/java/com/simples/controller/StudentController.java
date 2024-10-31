@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.dto.StudentDTO;
 import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Student;
@@ -47,7 +48,7 @@ public class StudentController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping
-    public Student saveStudent(@Valid @RequestBody Student student) {
+    public StudentDTO saveStudent(@Valid @RequestBody Student student) {
         return studentService.addStudent(student);
     }
 
@@ -62,7 +63,7 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Student> fetchStudentList() throws InvalidDataException {
+    public List<StudentDTO> fetchStudentList() throws InvalidDataException {
         return studentService.getStudentList();
     }
 
@@ -74,13 +75,14 @@ public class StudentController {
     @Operation(summary = "Get a student by ID", description = "Fetches a student entity by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the student"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Student not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public Student getStudent(
+    public StudentDTO getStudent(
             @Parameter(description = "ID of the student to be retrieved") @PathVariable("id") Long studentId) throws ResourceNotFoundException, InvalidDataException {
-        return studentService.findStudentById(studentId);
+        return studentService.findStudentById(studentId, "classroom");
     }
 
     /**
@@ -98,7 +100,7 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
-    public Student updateStudent(
+    public StudentDTO updateStudent(
             @Parameter(description = "Updated student data") @RequestBody Student student,
             @Parameter(description = "ID of the student to be updated") @PathVariable("id") Long studentId) throws ResourceNotFoundException {
         return studentService.updateStudent(student, studentId);

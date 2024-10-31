@@ -2,6 +2,7 @@ package com.simples.model;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,8 +16,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +31,8 @@ import lombok.NoArgsConstructor;
 @Data // Generates getters, setters, toString, equals, and hashCode methods.
 @AllArgsConstructor // Generates a constructor with all arguments.
 @NoArgsConstructor
-@Builder // Generates a builder pattern for creating instances.
+@SQLDelete(sql = "UPDATE classrooms SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Classroom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,4 +55,7 @@ public class Classroom {
 
     @OneToMany(mappedBy = "classroom", fetch = FetchType.LAZY)
     private List<Student> students;
+
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = Boolean.FALSE;
 }

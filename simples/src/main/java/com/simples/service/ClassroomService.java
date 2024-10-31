@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +52,8 @@ public class ClassroomService {
     }
     
 
-    public Classroom addClassroom(Classroom classroom) {
-        return classroomRepository.save(classroom);
+    public ClassroomDTO addClassroom(Classroom classroom) {
+        return convertToDTO(classroomRepository.save(classroom));
     }
 
 
@@ -65,13 +66,13 @@ public class ClassroomService {
 
         spec = verifyIncludes(spec, includesList);
 
-        List<Classroom> classrooms = classroomRepository.findAll(spec);
+        List<Classroom> classrooms = classroomRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
         return convertToDTOList(classrooms, includesList);
 
     }
 
 
-    public Classroom updateClassroom(Classroom classroom, Long classroomId) throws ResourceNotFoundException {
+    public ClassroomDTO updateClassroom(Classroom classroom, Long classroomId) throws ResourceNotFoundException {
 
         Classroom classroomDB = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
@@ -89,7 +90,7 @@ public class ClassroomService {
             classroomDB.setTrainer(classroom.getTrainer());
         }
 
-        return classroomRepository.save(classroomDB);
+        return convertToDTO(classroomRepository.save(classroomDB));
     }
 
 
@@ -98,6 +99,18 @@ public class ClassroomService {
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
         classroomRepository.delete(classroom);
+    }
+
+
+    public ClassroomDTO convertToDTO(Classroom classroom) {
+        return ClassroomDTO.builder()
+                .id(classroom.getId())
+                .className(classroom.getClassName())
+                .classNumber(classroom.getClassNumber())
+                .trainer(null)
+                .program(null)
+                .students(null)
+                .build();
     }
 
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.dto.TrainerDTO;
 import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Trainer;
@@ -47,7 +48,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping
-    public Trainer saveTrainer(@Valid @RequestBody Trainer trainer) {
+    public TrainerDTO saveTrainer(@Valid @RequestBody Trainer trainer) {
         return trainerService.addTrainer(trainer);
     }
 
@@ -62,7 +63,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Trainer> fetchTrainerList() throws InvalidDataException {
+    public List<TrainerDTO> fetchTrainerList() throws InvalidDataException {
         return trainerService.getTrainerList();
     }
 
@@ -74,13 +75,14 @@ public class TrainerController {
     @Operation(summary = "Get a trainer by ID", description = "Fetches a trainer entity by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the trainer"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Trainer not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public Trainer getTrainer(
+    public TrainerDTO getTrainer(
             @Parameter(description = "ID of the trainer to be retrieved") @PathVariable("id") Long trainerId) throws ResourceNotFoundException, InvalidDataException {
-        return trainerService.findTrainerById(trainerId);
+        return trainerService.findTrainerById(trainerId, "classrooms");
     }
 
     /**
@@ -98,7 +100,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
-    public Trainer updateTrainer(
+    public TrainerDTO updateTrainer(
             @Parameter(description = "Updated trainer data") @RequestBody Trainer trainer,
             @Parameter(description = "ID of the trainer to be updated") @PathVariable("id") Long trainerId) throws ResourceNotFoundException{
         return trainerService.updateTrainer(trainer, trainerId);

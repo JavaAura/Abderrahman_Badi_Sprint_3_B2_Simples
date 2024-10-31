@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +47,8 @@ public class ProgramService {
         return convertToDTO(program, includesList);
     }
 
-    public Program addProgram(Program program) {
-        return programRepository.save(program);
+    public ProgramDTO addProgram(Program program) {
+        return convertToDTO(programRepository.save(program));
     }
 
     public List<ProgramDTO> getProgramList(String... with) throws InvalidDataException {
@@ -57,12 +58,12 @@ public class ProgramService {
 
         spec = verifyIncludes(spec, includesList);
 
-        List<Program> programs = programRepository.findAll(spec);
-        
+        List<Program> programs = programRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
+
         return convertToDTOList(programs, includesList);
     }
 
-    public Program updateProgram(Program program, Long programId) throws ResourceNotFoundException {
+    public ProgramDTO updateProgram(Program program, Long programId) throws ResourceNotFoundException {
 
         Program programDB = programRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with ID: " + programId));
@@ -90,13 +91,26 @@ public class ProgramService {
             programDB.setProgramStatus(program.getProgramStatus());
         }
 
-        return programRepository.save(programDB);
+        return convertToDTO(programRepository.save(programDB));
     }
 
     public void deleteProgramById(Long programId) throws ResourceNotFoundException {
         Program program = programRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with ID: " + programId));
         programRepository.delete(program);
+    }
+
+    public ProgramDTO convertToDTO(Program program) {
+        return ProgramDTO.builder()
+                .id(program.getId())
+                .title(program.getTitle())
+                .grade(program.getGrade())
+                .minCapacity(program.getMinCapacity())
+                .maxCapacity(program.getMaxCapacity())
+                .starDate(program.getStarDate())
+                .endDate(program.getEndDate())
+                .classrooms(null)
+                .build();
     }
 
     public ProgramDTO convertToDTO(Program program, List<String> includesList) {
@@ -139,8 +153,7 @@ public class ProgramService {
             }
         }
 
-        if (includesList.contains("trainer")) {
-            log.info("trainer spec");
+        if (includesList.contains("classrooms")) {
             spec = spec.and(ProgramSpecifications.fetchClassrooms());
         }
 

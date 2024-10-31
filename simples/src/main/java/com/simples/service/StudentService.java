@@ -1,15 +1,28 @@
 package com.simples.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.simples.dto.ClassroomDTO;
+import com.simples.dto.ProgramDTO;
+import com.simples.dto.StudentDTO;
+import com.simples.dto.TrainerDTO;
+import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
+import com.simples.model.Classroom;
 import com.simples.model.Student;
+import com.simples.model.Program;
+import com.simples.model.Trainer;
 import com.simples.repository.StudentRepository;
+import com.simples.specifications.StudentSpecifications;
 
 /**
  * Service interface for Student entity.
@@ -17,27 +30,37 @@ import com.simples.repository.StudentRepository;
  */
 @Service
 public class StudentService {
+    private final List<String> VALID_INCLUDES = Arrays.asList("classroom");
 
     @Autowired
     private StudentRepository studentRepository;
 
-    public Student findStudentById(long id) throws ResourceNotFoundException {
-        return studentRepository.findById(id)
+    public StudentDTO findStudentById(long id, String... with) throws ResourceNotFoundException, InvalidDataException {
+        List<String> includesList = Arrays.asList(with);
+        Specification<Student> spec = Specification.where(StudentSpecifications.hasId(id));
+        spec = verifyIncludes(spec, includesList);
+
+        Student student = studentRepository.findOne(spec)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
+        return convertToDTO(student, includesList);
     }
 
-    public Student addStudent(Student student) {
-        return studentRepository.save(student);
+    public StudentDTO addStudent(Student student) {
+        return convertToDTO(studentRepository.save(student));
     }
 
-    public List<Student> getStudentList() {
-
-        return (List<Student>) studentRepository.findAll();
+    public List<StudentDTO> getStudentList(String... with) throws InvalidDataException {
+        List<String> includesList = Arrays.asList(with);
+        Specification<Student> spec = Specification.where(null);
+        spec = verifyIncludes(spec, includesList);
+        List<Student> students = studentRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
+        return convertToDTOList(students, includesList);
     }
 
-    public Student updateStudent(Student student, Long studentId) throws ResourceNotFoundException {
+    public StudentDTO updateStudent(Student student, Long studentId) throws ResourceNotFoundException {
 
-        Student studentDB = findStudentById(studentId);
+        Student studentDB = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
 
         // Updates fields if they are not null or empty.
         if (StringUtils.isNotBlank(student.getFirstName())) {
@@ -55,11 +78,72 @@ public class StudentService {
         if (Objects.nonNull(student.getClassroom())) {
             studentDB.setClassroom(student.getClassroom());
         }
-        return studentRepository.save(studentDB);
+        return convertToDTO(studentRepository.save(studentDB));
     }
 
     public void deleteStudentById(Long studentId) throws ResourceNotFoundException {
-        Student student = findStudentById(studentId);
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
+
         studentRepository.delete(student);
+    }
+
+    public StudentDTO convertToDTO(Student student) {
+        return StudentDTO.builder()
+                .id(student.getId())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .email(student.getEmail())
+                .grade(student.getGrade())
+                .classroom(null)
+                .build();
+    }
+
+    public StudentDTO convertToDTO(Student student, List<String> includesList) {
+        ClassroomDTO classroomDTO = null;
+        TrainerDTO trainerDTO = null;
+        ProgramDTO programDTO = null;
+
+        if (includesList.contains("classroom")) {
+            Classroom classroom = student.getClassroom();
+            Trainer trainer = classroom.getTrainer();
+            Program program = classroom.getProgram();
+            trainerDTO = new TrainerDTO(null, trainer.getFirstName(), trainer.getLastName(), null, null, null);
+            programDTO = new ProgramDTO(null, program.getTitle(), null, null, null, program.getStarDate(),
+                    program.getEndDate(), null, null);
+            classroomDTO = new ClassroomDTO(null, classroom.getClassName(), classroom.getClassNumber(), trainerDTO,
+                    programDTO, null);
+        }
+
+        return StudentDTO.builder()
+                .id(student.getId())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .email(student.getEmail())
+                .grade(student.getGrade())
+                .classroom(classroomDTO)
+                .build();
+    }
+
+    public List<StudentDTO> convertToDTOList(List<Student> students, List<String> includes) {
+        return students.stream()
+                .map(student -> convertToDTO(student, includes))
+                .collect(Collectors.toList());
+    }
+
+    public Specification<Student> verifyIncludes(Specification<Student> spec, List<String> includesList)
+            throws InvalidDataException {
+
+        for (String include : includesList) {
+            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
+                throw new InvalidDataException("Invalid include: " + include);
+            }
+        }
+
+        if (includesList.contains("classroom")) {
+            spec = spec.and(StudentSpecifications.fetchClassroom());
+        }
+
+        return spec;
     }
 }

@@ -48,7 +48,7 @@ public class ProgramController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping
-    public Program saveProgram(@Valid @RequestBody Program program) {
+    public ProgramDTO saveProgram(@Valid @RequestBody Program program) {
         return programService.addProgram(program);
     }
 
@@ -75,6 +75,7 @@ public class ProgramController {
     @Operation(summary = "Get a program by ID", description = "Fetches a program entity by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the program"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Program not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -99,7 +100,7 @@ public class ProgramController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
-    public Program updateProgram(
+    public ProgramDTO updateProgram(
             @Parameter(description = "Updated program data") @RequestBody Program program,
             @Parameter(description = "ID of the program to be updated") @PathVariable("id") Long programId) throws ResourceNotFoundException {
         return programService.updateProgram(program, programId);

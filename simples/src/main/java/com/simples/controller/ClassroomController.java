@@ -56,7 +56,7 @@ public class ClassroomController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PostMapping
-    public Classroom saveClassroom(@Valid @RequestBody Classroom classroom) {
+    public ClassroomDTO saveClassroom(@Valid @RequestBody Classroom classroom) {
         return classroomService.addClassroom(classroom);
     }
 
@@ -83,6 +83,7 @@ public class ClassroomController {
     @Operation(summary = "Get a classroom by ID", description = "Fetches a classroom entity by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the classroom"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Classroom not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -108,7 +109,7 @@ public class ClassroomController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}")
-    public Classroom updateClassroom(
+    public ClassroomDTO updateClassroom(
             @Parameter(description = "Updated classroom data") @RequestBody Classroom classroom,
             @Parameter(description = "ID of the classroom to be updated") @PathVariable("id") Long classroomId)
             throws ResourceNotFoundException, InvalidDataException {

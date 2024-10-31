@@ -1,5 +1,6 @@
 package com.simples.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -7,8 +8,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,7 +24,8 @@ import lombok.NoArgsConstructor;
 @Data // Generates getters, setters, toString, equals, and hashCode methods.
 @AllArgsConstructor // Generates a constructor with all arguments.
 @NoArgsConstructor
-@Builder
+@SQLDelete(sql = "UPDATE students SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 @EqualsAndHashCode(callSuper = true)
 public class Student extends User {
 
@@ -32,4 +36,7 @@ public class Student extends User {
     @JoinColumn(name = "classroom_id")
     // @JsonBackReference(value = "student-classroom")
     private Classroom classroom;
+
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = Boolean.FALSE;
 }

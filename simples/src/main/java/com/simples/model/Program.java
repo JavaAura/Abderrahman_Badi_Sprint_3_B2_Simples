@@ -10,10 +10,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,6 +35,8 @@ import lombok.NoArgsConstructor;
 @Data // Generates getters, setters, toString, equals, and hashCode methods.
 @AllArgsConstructor // Generates a constructor with all arguments.
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE programs SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Program {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,4 +69,7 @@ public class Program {
     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
     // @JsonManagedReference(value = "classroom-program")
     private List<Classroom> classrooms;
+
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = Boolean.FALSE;
 }

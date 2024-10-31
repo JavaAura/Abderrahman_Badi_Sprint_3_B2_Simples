@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +50,12 @@ public class StudentService {
         return convertToDTO(studentRepository.save(student));
     }
 
-    public List<StudentDTO> getStudentList(String... with) throws InvalidDataException {
+    public Page<StudentDTO> getStudentList(Pageable pageable, String... with) throws InvalidDataException {
         List<String> includesList = Arrays.asList(with);
         Specification<Student> spec = Specification.where(null);
         spec = verifyIncludes(spec, includesList);
-        List<Student> students = studentRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
-        return convertToDTOList(students, includesList);
+        Page<Student> studentPage = studentRepository.findAll(spec, pageable);
+        return studentPage.map(student -> convertToDTO(student, includesList));
     }
 
     public StudentDTO updateStudent(Student student, Long studentId) throws ResourceNotFoundException {

@@ -67,11 +67,12 @@ public class StudentController {
         })
         @GetMapping
         public Page<StudentDTO> fetchStudentList(
-                        @Parameter(description = "Page number") @RequestParam int page,
-                        @Parameter(description = "Size of items per page") @RequestParam int size)
+                        @Parameter(description = "Page number") @RequestParam(defaultValue = "1") int page,
+                        @Parameter(description = "Size of items per page") @RequestParam(defaultValue = "5") int size,
+                        @Parameter(description = "Search parameter", required = false) @RequestParam(required = false) String search)
                         throws InvalidDataException {
                 Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-                return studentService.getStudentList(pageable);
+                return studentService.getStudentList(pageable, search);
         }
 
         /**

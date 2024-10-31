@@ -50,9 +50,14 @@ public class StudentService {
         return convertToDTO(studentRepository.save(student));
     }
 
-    public Page<StudentDTO> getStudentList(Pageable pageable, String... with) throws InvalidDataException {
+    public Page<StudentDTO> getStudentList(Pageable pageable, String searcgTerm,String... with) throws InvalidDataException {
         List<String> includesList = Arrays.asList(with);
         Specification<Student> spec = Specification.where(null);
+
+        if(!searcgTerm.isEmpty() && searcgTerm != null){
+            spec = spec.and(StudentSpecifications.searchByTerm(searcgTerm));
+        }
+
         spec = verifyIncludes(spec, includesList);
         Page<Student> studentPage = studentRepository.findAll(spec, pageable);
         return studentPage.map(student -> convertToDTO(student, includesList));

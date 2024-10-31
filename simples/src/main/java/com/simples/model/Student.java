@@ -1,6 +1,7 @@
 package com.simples.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,12 +23,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(callSuper = true)
-public class Student extends User{
+public class Student extends User {
 
     @NotBlank(message = "Grade shoudln't be empty")
     private String grade;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
+    // @JsonBackReference(value = "student-classroom")
     private Classroom classroom;
 }

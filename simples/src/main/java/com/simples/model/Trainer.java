@@ -3,10 +3,12 @@ package com.simples.model;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +30,7 @@ public class Trainer extends User {
     @NotBlank(message = "Speciality shoudln't be empty")
     private String speciality;
 
-    @OneToMany
-    @JoinColumn(name = "trainer_id")
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
+    // @JsonBackReference(value = "classroom-trainer")
     private List<Classroom> classrooms;
 }

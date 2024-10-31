@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.dto.ClassroomDTO;
+import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Classroom;
 import com.simples.service.ClassroomService;
+import com.simples.service.ProgramService;
+import com.simples.service.TrainerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +37,12 @@ public class ClassroomController {
 
     @Autowired
     private ClassroomService classroomService;
+
+    @Autowired
+    private TrainerService trainerService;
+
+    @Autowired
+    private ProgramService programService;
 
     /**
      * Handles POST requests to save a new classroom.
@@ -61,8 +71,8 @@ public class ClassroomController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Classroom> fetchClassroomList() {
-        return classroomService.getClassroomList();
+    public List<ClassroomDTO> fetchClassroomList() throws InvalidDataException {
+        return classroomService.getClassroomList("program", "trainer");
     }
 
     /**
@@ -77,9 +87,10 @@ public class ClassroomController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public Classroom getClassroom(
-            @Parameter(description = "ID of the classroom to be retrieved") @PathVariable("id") Long classroomId) throws ResourceNotFoundException {
-        return classroomService.findClassroomById(classroomId);
+    public ClassroomDTO getClassroom(
+            @Parameter(description = "ID of the classroom to be retrieved") @PathVariable("id") Long classroomId)
+            throws ResourceNotFoundException, InvalidDataException {
+        return classroomService.findClassroomById(classroomId, "students", "trainer", "program");
     }
 
     /**
@@ -99,7 +110,14 @@ public class ClassroomController {
     @PutMapping("/{id}")
     public Classroom updateClassroom(
             @Parameter(description = "Updated classroom data") @RequestBody Classroom classroom,
-            @Parameter(description = "ID of the classroom to be updated") @PathVariable("id") Long classroomId) throws ResourceNotFoundException {
+            @Parameter(description = "ID of the classroom to be updated") @PathVariable("id") Long classroomId)
+            throws ResourceNotFoundException {
+        if (classroom.getProgram() != null) {
+            programService.findProgramById(classroom.getProgram().getId());
+        }
+        if (classroom.getTrainer() != null) {
+            trainerService.findTrainerById(classroom.getTrainer().getId());
+        }
         return classroomService.updateClassroom(classroom, classroomId);
     }
 
@@ -116,9 +134,11 @@ public class ClassroomController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
-    public String deleteClassroomById(@Parameter(description = "ID of the classroom to be deleted") @PathVariable("id") Long classroomId) throws ResourceNotFoundException {
+    public String deleteClassroomById(
+            @Parameter(description = "ID of the classroom to be deleted") @PathVariable("id") Long classroomId)
+            throws ResourceNotFoundException {
         classroomService.deleteClassroomById(classroomId);
         return "Deleted Successfully";
     }
-    
+
 }

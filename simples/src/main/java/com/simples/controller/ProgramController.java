@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.dto.ProgramDTO;
+import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Program;
 import com.simples.service.ProgramService;
@@ -61,7 +63,7 @@ public class ProgramController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Program> fetchProgramList() {
+    public List<ProgramDTO> fetchProgramList() throws InvalidDataException {
         return programService.getProgramList();
     }
 
@@ -78,7 +80,7 @@ public class ProgramController {
     })
     @GetMapping("/{id}")
     public Program getProgram(
-            @Parameter(description = "ID of the program to be retrieved") @PathVariable("id") Long programId) throws ResourceNotFoundException {
+            @Parameter(description = "ID of the program to be retrieved") @PathVariable("id") Long programId) throws ResourceNotFoundException, InvalidDataException {
         return programService.findProgramById(programId);
     }
 

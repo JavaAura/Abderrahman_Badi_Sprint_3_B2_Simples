@@ -3,6 +3,7 @@ package com.simples.model;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,15 +41,14 @@ public class Classroom {
     @Positive(message = "Class number must be positive")
     private int classNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id", referencedColumnName = "id")
     private Program program;
 
-    @OneToMany
-    @JoinColumn(name = "classroom_id")
+    @OneToMany(mappedBy = "classroom", fetch = FetchType.LAZY)
     private List<Student> students;
 }

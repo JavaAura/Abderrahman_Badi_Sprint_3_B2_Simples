@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Student;
 import com.simples.service.StudentService;
@@ -61,7 +62,7 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Student> fetchStudentList() {
+    public List<Student> fetchStudentList() throws InvalidDataException {
         return studentService.getStudentList();
     }
 
@@ -78,7 +79,7 @@ public class StudentController {
     })
     @GetMapping("/{id}")
     public Student getStudent(
-            @Parameter(description = "ID of the student to be retrieved") @PathVariable("id") Long studentId) throws ResourceNotFoundException {
+            @Parameter(description = "ID of the student to be retrieved") @PathVariable("id") Long studentId) throws ResourceNotFoundException, InvalidDataException {
         return studentService.findStudentById(studentId);
     }
 

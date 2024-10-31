@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Entity;
@@ -16,6 +16,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.simples.model.enums.ProgramStatus;
 
 import lombok.AllArgsConstructor;
@@ -59,7 +60,7 @@ public class Program {
     @NotBlank
     private ProgramStatus programStatus = ProgramStatus.PLANNED;
 
-    @OneToMany
-    @JoinColumn(name = "program_id")
+    @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+    // @JsonManagedReference(value = "classroom-program")
     private List<Classroom> classrooms;
 }

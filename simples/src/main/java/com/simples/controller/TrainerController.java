@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simples.exceptions.InvalidDataException;
 import com.simples.exceptions.ResourceNotFoundException;
 import com.simples.model.Trainer;
 import com.simples.service.TrainerService;
@@ -61,7 +62,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
-    public List<Trainer> fetchTrainerList() {
+    public List<Trainer> fetchTrainerList() throws InvalidDataException {
         return trainerService.getTrainerList();
     }
 
@@ -78,7 +79,7 @@ public class TrainerController {
     })
     @GetMapping("/{id}")
     public Trainer getTrainer(
-            @Parameter(description = "ID of the trainer to be retrieved") @PathVariable("id") Long trainerId) throws ResourceNotFoundException {
+            @Parameter(description = "ID of the trainer to be retrieved") @PathVariable("id") Long trainerId) throws ResourceNotFoundException, InvalidDataException {
         return trainerService.findTrainerById(trainerId);
     }
 

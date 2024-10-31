@@ -1,6 +1,7 @@
 package com.simples.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.simples.model.Trainer;
@@ -10,5 +11,5 @@ import com.simples.model.Trainer;
  * Provides CRUD operations and custom query methods through JpaRepository.
  */
 @Repository
-public interface TrainerRepository extends JpaRepository<Trainer, Long> {
+public interface TrainerRepository extends JpaRepository<Trainer, Long>, JpaSpecificationExecutor<Trainer> {
 }

@@ -15,4 +15,7 @@ public class ProgramSpecifications {
         };
     }
 
+    public static Specification<Program> hasId(Long id) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("id"), id);
+    }
 }

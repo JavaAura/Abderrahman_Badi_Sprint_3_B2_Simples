@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.simples.dto.ClassroomDTO;
 import com.simples.dto.ProgramDTO;
@@ -37,67 +36,46 @@ public class ClassroomService {
     @Autowired
     private ClassroomRepository classroomRepository;
 
-    public ClassroomDTO findClassroomById(long id, String... with) throws ResourceNotFoundException, InvalidDataException {
-        List<String> includesList = Arrays.asList(with);
 
-        for (String include : includesList) {
-            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
-                throw new InvalidDataException("Invalid include: " + include);
-            }
-        }
+    public ClassroomDTO findClassroomById(long id, String... with)
+            throws ResourceNotFoundException, InvalidDataException {
+        List<String> includesList = Arrays.asList(with);
 
         Specification<Classroom> spec = Specification.where(ClassroomSpecifications.hasId(id));
 
-        if (includesList.contains("trainer")) {
-            spec = spec.and(ClassroomSpecifications.fetchTrainer());
-        }
-        if (includesList.contains("program")) {
-            spec = spec.and(ClassroomSpecifications.fetchProgram());
-        }
-        if (includesList.contains("students")) {
-            spec = spec.and(ClassroomSpecifications.fetchStudents());
-        }
+        spec = verifyIncludes(spec, includesList);
 
-        Classroom classroom = classroomRepository.findOne(spec).orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + id));
+        Classroom classroom = classroomRepository.findOne(spec)
+                .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + id));
         return convertToDTO(classroom, includesList);
     }
+    
 
     public Classroom addClassroom(Classroom classroom) {
         return classroomRepository.save(classroom);
     }
 
-    @Transactional(readOnly = true)
+
+
     public List<ClassroomDTO> getClassroomList(String... with) throws InvalidDataException {
 
         List<String> includesList = Arrays.asList(with);
 
-        for (String include : includesList) {
-            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
-                throw new InvalidDataException("Invalid include: " + include);
-            }
-        }
         Specification<Classroom> spec = Specification.where(null);
 
-        if (includesList.contains("trainer")) {
-            spec = spec.and(ClassroomSpecifications.fetchTrainer());
-        }
-        if (includesList.contains("program")) {
-            spec = spec.and(ClassroomSpecifications.fetchProgram());
-        }
-        if (includesList.contains("students")) {
-            spec = spec.and(ClassroomSpecifications.fetchStudents());
-        }
+        spec = verifyIncludes(spec, includesList);
 
         List<Classroom> classrooms = classroomRepository.findAll(spec);
         return convertToDTOList(classrooms, includesList);
 
     }
 
+
     public Classroom updateClassroom(Classroom classroom, Long classroomId) throws ResourceNotFoundException {
 
-        Classroom classroomDB = classroomRepository.findById(classroomId).orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
+        Classroom classroomDB = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
 
-        // Updates fields if they are not null or empty.
         if (StringUtils.isNotBlank(classroom.getClassName())) {
             classroomDB.setClassName(classroom.getClassName());
         }
@@ -114,10 +92,14 @@ public class ClassroomService {
         return classroomRepository.save(classroomDB);
     }
 
+
+
     public void deleteClassroomById(Long classroomId) throws ResourceNotFoundException {
-        Classroom classroom = classroomRepository.findById(classroomId).orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with ID: " + classroomId));
         classroomRepository.delete(classroom);
     }
+
 
     public ClassroomDTO convertToDTO(Classroom classroom, List<String> includesList) {
         TrainerDTO trainerDTO = null;
@@ -164,5 +146,27 @@ public class ClassroomService {
         return classrooms.stream()
                 .map(classroom -> convertToDTO(classroom, includes))
                 .collect(Collectors.toList());
+    }
+
+    public Specification<Classroom> verifyIncludes(Specification<Classroom> spec, List<String> includesList)
+            throws InvalidDataException {
+
+        for (String include : includesList) {
+            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
+                throw new InvalidDataException("Invalid include: " + include);
+            }
+        }
+
+        if (includesList.contains("trainer")) {
+            spec = spec.and(ClassroomSpecifications.fetchTrainer());
+        }
+        if (includesList.contains("program")) {
+            spec = spec.and(ClassroomSpecifications.fetchProgram());
+        }
+        if (includesList.contains("students")) {
+            spec = spec.and(ClassroomSpecifications.fetchStudents());
+        }
+
+        return spec;
     }
 }

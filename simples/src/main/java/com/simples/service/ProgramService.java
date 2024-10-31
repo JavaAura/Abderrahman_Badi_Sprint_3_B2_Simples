@@ -33,9 +33,17 @@ public class ProgramService {
     @Autowired
     private ProgramRepository programRepository;
 
-    public Program findProgramById(long id) throws ResourceNotFoundException {
-        return programRepository.findById(id)
+    public ProgramDTO findProgramById(long id, String... with) throws ResourceNotFoundException, InvalidDataException {
+        List<String> includesList = Arrays.asList(with);
+
+        Specification<Program> spec = Specification.where(ProgramSpecifications.hasId(id));
+
+        spec = verifyIncludes(spec, includesList);
+
+        Program program = programRepository.findOne(spec)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with ID: " + id));
+
+        return convertToDTO(program, includesList);
     }
 
     public Program addProgram(Program program) {
@@ -45,25 +53,19 @@ public class ProgramService {
     public List<ProgramDTO> getProgramList(String... with) throws InvalidDataException {
         List<String> includesList = Arrays.asList(with);
 
-        for (String include : includesList) {
-            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
-                throw new InvalidDataException("Invalid include: " + include);
-            }
-        }
         Specification<Program> spec = Specification.where(null);
 
-        if (includesList.contains("trainer")) {
-            log.info("trainer spec");
-            spec = spec.and(ProgramSpecifications.fetchClassrooms());
-        }
+        spec = verifyIncludes(spec, includesList);
 
         List<Program> programs = programRepository.findAll(spec);
+        
         return convertToDTOList(programs, includesList);
     }
 
     public Program updateProgram(Program program, Long programId) throws ResourceNotFoundException {
 
-        Program programDB = findProgramById(programId);
+        Program programDB = programRepository.findById(programId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with ID: " + programId));
 
         // Updates fields if they are not null or empty.
         if (StringUtils.isNotBlank(program.getTitle())) {
@@ -92,7 +94,8 @@ public class ProgramService {
     }
 
     public void deleteProgramById(Long programId) throws ResourceNotFoundException {
-        Program program = findProgramById(programId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with ID: " + programId));
         programRepository.delete(program);
     }
 
@@ -125,5 +128,22 @@ public class ProgramService {
         return programs.stream()
                 .map(program -> convertToDTO(program, includes))
                 .collect(Collectors.toList());
+    }
+
+    public Specification<Program> verifyIncludes(Specification<Program> spec, List<String> includesList)
+            throws InvalidDataException {
+
+        for (String include : includesList) {
+            if (!include.isEmpty() && !VALID_INCLUDES.contains(include)) {
+                throw new InvalidDataException("Invalid include: " + include);
+            }
+        }
+
+        if (includesList.contains("trainer")) {
+            log.info("trainer spec");
+            spec = spec.and(ProgramSpecifications.fetchClassrooms());
+        }
+
+        return spec;
     }
 }

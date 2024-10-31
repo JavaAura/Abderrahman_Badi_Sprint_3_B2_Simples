@@ -79,9 +79,9 @@ public class ProgramController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public Program getProgram(
+    public ProgramDTO getProgram(
             @Parameter(description = "ID of the program to be retrieved") @PathVariable("id") Long programId) throws ResourceNotFoundException, InvalidDataException {
-        return programService.findProgramById(programId);
+        return programService.findProgramById(programId, "classrooms");
     }
 
     /**

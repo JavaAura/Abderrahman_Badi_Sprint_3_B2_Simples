@@ -111,7 +111,7 @@ public class ClassroomController {
     public Classroom updateClassroom(
             @Parameter(description = "Updated classroom data") @RequestBody Classroom classroom,
             @Parameter(description = "ID of the classroom to be updated") @PathVariable("id") Long classroomId)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, InvalidDataException {
         if (classroom.getProgram() != null) {
             programService.findProgramById(classroom.getProgram().getId());
         }

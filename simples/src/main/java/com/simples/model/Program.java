@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // Generates a constructor with all arguments.
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE programs SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
+@Where(clause = "deleted = false")
 public class Program {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

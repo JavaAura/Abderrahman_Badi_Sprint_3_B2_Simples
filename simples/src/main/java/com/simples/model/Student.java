@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // Generates a constructor with all arguments.
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE students SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
+@Where(clause = "deleted = false")
 @EqualsAndHashCode(callSuper = true)
 public class Student extends User {
 

@@ -1,6 +1,6 @@
-# Wolf Esports Tournament Manager
+# Simples API
 
-A console and web application for managing players, teams, and tournaments in the e-sport domain, developed using Java, Spring Core, and Hibernate.
+A REST API for digitalizing the management of training programs, learners, trainers, and training sessions at a training center, developed using Java and Spring Boot
 
 ## Table of Contents
 
@@ -14,14 +14,14 @@ A console and web application for managing players, teams, and tournaments in th
 ## Project Overview
 
 **Context**:  
-Wolf Esports is designed for an e-sport organization to help organize and monitor video game tournaments. The application manages players, teams, and tournaments efficiently, providing both basic and advanced tournament duration estimations.
+The Training Management API is designed for a training center to manage training programs digitally. It allows for the management of learners, trainers, classes, and training sessions through a RESTful interface.
 
 **Objectives**:
-- Implement player, team, and tournament management.
-- Use Spring Core for Dependency Injection (DI) via XML configuration `applicationContext.xml`.
-- Implement CRUD operations for `players`, `teams`, and `tournaments`.
-- Apply a layered architecture (MVC) to separate presentation, business, and persistence logic.
-- Demonstrate the Open/Closed principle by extending the `TournamentDao` interface.
+- Implementing a management system for `students`, `trainers`, `classrooms`, and training `programs`.
+- The use Spring Boot for creating a robust REST API with proper endpoint management.
+- Utilizing Spring Data JPA for data access and repository management.
+- Implement validation and exception handling for API requests.
+- Document the API using Swagger.
 
 ## Installation
 
@@ -29,103 +29,75 @@ Wolf Esports is designed for an e-sport organization to help organize and monito
 
 - Java 8 or higher
 - Apache Maven
-- MySQL Server
-
-### Setup your database:
-
-1. The application automatically creates the required tables in the H2 database when it runs, as configured in `persistence.xml`.
-
-### Setup environment variable
-
-1. **For windows:**
-   ```cmd
-   set DB_URL= "database url"
-   set DB_USER= "username"
-   set DB_PASSWORD = "password"
-
-2. **For linux based:**
-   ```bash
-   export DB_URL= "database url"
-   export DB_USER= "username"
-   export DB_PASSWORD = "password"
-
+- PostgreSQL Server
 
 ### Steps
 
 1. **Clone the repository:**
 
    ```sh
-   git clone https://https://github.com/Yorften/WolfEsports.git
-   cd WolfEsports/wolfesports
+   git clone https://github.com/Yorften/Simples.git
+   cd Simples/simples
 
 2. **Build the application:**
    ```sh
    mvn clean install
 
-3. **Compile the application:**
+3. **Run the application:**
    ```sh
-   mvn package
-
-4. **Deploy:**
-
-- Deploy the WAR file in Apache Tomcat by copying the WAR from the /target folder to Tomcat's webapps directory.
-- Start the Tomcat server and access the application in your browser at http://localhost:8080/WolfEsports.
-
-5. **Run with Eclipse/IntelliJ IDEA (optional)**
-
-- Open the project in your ide.
-- Build maven dependencies.
-- Run the app or server.
+   mvn spring-boot:run
 
 ## Structure
 
-- **Model Layer**:  
-  Defines entities such as `Player`, `Team`, `Tournament`, and `Game` and their relationships using JPA.
-  
-- **Controller Layer**:  
-  Handles user interactions, receives input from the UI, and communicates with the Service layer to process the requests.
-  
+- **Entities**:  
+  Defines JPA entities such as `User`, `Trainer`, `Student`, ect... and their relationships using JPA.
+
 - **Repository Layer**:  
-  Provides an abstraction for data access. This layer interacts with the database using JDBC and Hibernate ORM to handles CRUD operations.
-  
+  Extend `JpaRepository` for data access and include custom query methods.
+
 - **Service Layer**:  
   Contains business logic and orchestrates operations between the Controller and Repository layers.
   
-- **Presentation Layer**:  
-  Thymeleaf templates are used to create dynamic and reusable layouts.
+- **Controller Layer**:  
+  Implements REST endpoints for managing learners, trainers, classes, and training sessions using `@RestController` annotation.
+  
+- **Exceptions**:  
+  Centralized exception handling for REST API responses.
+
+- **Utilities**:  
+  Common utility classes and methods.
+
+- **Tests**:  
+  Integration tests implemented with JUnit.
 
 ## Features
 
-1. **Player Management**:
-   - Register, update, delete, and view player details.
+1. **Student Management**:
+   - Register, update, delete, and view students details.
 
-2. **Team Management**:
-   - Create, update, add/remove players, and view team details.
+2. **Trainer Management**:
+   - Create, update, add/remove players, and view trainers details.
 
-3. **Tournament Management**:
-   - Create, update, add/remove teams, and view tournament details.
-   - Calculate the estimated duration of tournaments (basic and advanced).
+3. **Program Management**:
+   - Create, update, add/remove teams, and view programs details.
 
-4. **Game Management**:
-   - Create, update, add/remove games.
+4. **Classroom Management**:
+   - Register, update, delete, and view class rooms details.
 
-5. **Advanced Features**:
-   - Status tracking for orders (On hold, Processing, Shipped, etc..).
-   - Pagination and search functionality for large datasets.
+5. **API Documentation**:
+   - Automatic documentation of API endpoints using Swagger.
 
 
 ## Technologies
 
 - **Java 8**: Core language used for development.
-- **Spring Core**: For Dependency Injection (DI) via XML configuration.
 - **Apache Maven**: For dependency management and project build.
-- **MySQL**: Relational database for storing data.
+- **Spring Boot**: For creating the REST API and managing application configuration.
+- **Spring Data JPA**: For database interactions and repository management.
+- **PostgreSql**: Relational database for storing data.
 - **H2 Database**: In-memory database for development.
 - **Hibernate**: ORM for database access and management.
-- **Apache Tomcat**: Web server for deploying the application.
 - **JUnit**: For unit testing.
-- **Mockito**: For mocking classes to unit test.
 - **JaCoCo**: For code coverage.
-- **Tailwind CSS**: For responsive UI design.
-- **JIRA**: For project management using Scrum methodology.
-- **Git**: For version control with branches.
+- **Lombok**: For reducing boilerplate code.
+- **Swagger**: For API documentation.

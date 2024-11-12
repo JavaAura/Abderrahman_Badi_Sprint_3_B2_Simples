@@ -1,6 +1,6 @@
 package com.simples.util;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ErrorResponse {
-    private LocalDateTime timestamp;
+    private LocalDate timestamp;
     private String message;
     private int status;
 }

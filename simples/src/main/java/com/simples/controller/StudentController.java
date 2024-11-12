@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * REST controller for managing User entities.
@@ -34,6 +35,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
  */
 @RestController // Marks this class as a RESTful controller.
 @RequestMapping("/api/students")
+@Log4j2
 public class StudentController {
 
         @Autowired
@@ -71,7 +73,8 @@ public class StudentController {
                         @Parameter(description = "Size of items per page") @RequestParam(defaultValue = "5") int size,
                         @Parameter(description = "Search parameter", required = false) @RequestParam(required = false) String search)
                         throws InvalidDataException {
-                Pageable pageable = PageRequest.of((page-1), size, Sort.by("id").ascending());
+
+                Pageable pageable = PageRequest.of((page - 1), size, Sort.by("id").ascending());
                 return studentService.getStudentList(pageable, search);
         }
 

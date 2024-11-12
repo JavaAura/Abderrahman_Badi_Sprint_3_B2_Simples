@@ -33,7 +33,6 @@ public class Trainer extends User {
     private String speciality;
 
     @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
-    // @JsonBackReference(value = "classroom-trainer")
     private List<Classroom> classrooms;
 
     @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")

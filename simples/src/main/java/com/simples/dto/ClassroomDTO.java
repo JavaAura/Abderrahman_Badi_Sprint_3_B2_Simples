@@ -15,7 +15,7 @@ public class ClassroomDTO {
 
     private Long id;
     private String className;
-    private int classNumber;
+    private Integer classNumber;
     private TrainerDTO trainer;
     private ProgramDTO program;
     private List<StudentDTO> students;
